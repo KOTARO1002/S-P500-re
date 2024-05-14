@@ -1,5 +1,5 @@
 Flask==2.0.1
 tensorflow
-numpy==1.21.6
-pandas==1.2.4
+numpy
+pandas
 gunicorn==20.1.0
