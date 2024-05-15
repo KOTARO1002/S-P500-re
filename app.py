@@ -19,8 +19,8 @@ def home():
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
-        start_time = time.time()
-        
+        total_start_time = time.time()  # 全体の開始時間
+
         date_str = request.form['date']
         unrate = float(request.form['unrate'])
 
@@ -34,23 +34,22 @@ def predict():
         print(f"Received date: {date_str}, Unemployment rate: {unrate}")
         print(f"Features before scaling: {features}")
 
-        # 特徴量のスケーリング
-        features_scaled_start = time.time()
+        scaling_start_time = time.time()  # スケーリングの開始時間
         features_scaled = scaler.transform(features)
-        features_scaled_end = time.time()
+        scaling_end_time = time.time()  # スケーリングの終了時間
         print(f"Features after scaling: {features_scaled}")
-        print(f"Scaling time: {features_scaled_end - features_scaled_start} seconds")
 
-        # 予測を実行
-        prediction_start = time.time()
+        prediction_start_time = time.time()  # 予測の開始時間
         prediction = model.predict(features_scaled)
-        prediction_end = time.time()
         predicted_price = prediction[0][0]
-        print(f"Prediction: {predicted_price}")
-        print(f"Prediction time: {prediction_end - prediction_start} seconds")
+        prediction_end_time = time.time()  # 予測の終了時間
 
-        end_time = time.time()
-        print(f"Total request handling time: {end_time - start_time} seconds")
+        total_end_time = time.time()  # 全体の終了時間
+
+        # 各ステップの時間をログに出力
+        print(f"Scaling Time: {scaling_end_time - scaling_start_time} seconds")
+        print(f"Prediction Time: {prediction_end_time - prediction_start_time} seconds")
+        print(f"Total Time: {total_end_time - total_start_time} seconds")
 
         return render_template('index.html', predicted_price=predicted_price)
     except Exception as e:
