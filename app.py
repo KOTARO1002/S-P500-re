@@ -34,8 +34,8 @@ def predict():
         app.logger.info(f"Received date: {date_str}, Unemployment rate: {unrate}")
         app.logger.info(f"Features before scaling: {features}")
 
-        # フィーチャ名を設定
-        feature_names = ['year', 'month', 'unrate']
+        # フィーチャ名を設定（フィット時と一致させる）
+        feature_names = ['Year', 'Month', 'UNRATE']
         features_df = pd.DataFrame(features, columns=feature_names)
         features_scaled = scaler.transform(features_df)
 
