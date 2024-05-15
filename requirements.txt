@@ -4,3 +4,4 @@ numpy
 pandas
 gunicorn==20.1.0
 werkzeug==2.0.3
+joblib
