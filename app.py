@@ -27,11 +27,24 @@ def predict():
 
     # 特徴量を準備
     features = np.array([[year, month, unrate]])
-    features_scaled = scaler.transform(features)
+    
+    # デバッグログを追加
+    print(f"Received date: {date_str}, Unemployment rate: {unrate}")
+    print(f"Features before scaling: {features}")
+
+    # フィーチャ名を設定
+    feature_names = ['year', 'month', 'unrate']
+    features_df = pd.DataFrame(features, columns=feature_names)
+    features_scaled = scaler.transform(features_df)
+
+    # デバッグログを追加
+    print(f"Features after scaling: {features_scaled}")
 
     # 予測を実行
     prediction = model.predict(features_scaled)
     predicted_price = prediction[0][0]
+
+    print(f"Predicted price: {predicted_price}")
 
     return render_template('index.html', predicted_price=predicted_price)
 
