@@ -4,6 +4,7 @@ import numpy as np
 from datetime import datetime
 import joblib
 import os
+import time
 
 app = Flask(__name__)
 
@@ -18,6 +19,8 @@ def home():
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
+        start_time = time.time()
+        
         date_str = request.form['date']
         unrate = float(request.form['unrate'])
 
@@ -31,13 +34,23 @@ def predict():
         print(f"Received date: {date_str}, Unemployment rate: {unrate}")
         print(f"Features before scaling: {features}")
 
+        # 特徴量のスケーリング
+        features_scaled_start = time.time()
         features_scaled = scaler.transform(features)
+        features_scaled_end = time.time()
         print(f"Features after scaling: {features_scaled}")
+        print(f"Scaling time: {features_scaled_end - features_scaled_start} seconds")
 
         # 予測を実行
+        prediction_start = time.time()
         prediction = model.predict(features_scaled)
+        prediction_end = time.time()
         predicted_price = prediction[0][0]
         print(f"Prediction: {predicted_price}")
+        print(f"Prediction time: {prediction_end - prediction_start} seconds")
+
+        end_time = time.time()
+        print(f"Total request handling time: {end_time - start_time} seconds")
 
         return render_template('index.html', predicted_price=predicted_price)
     except Exception as e:
