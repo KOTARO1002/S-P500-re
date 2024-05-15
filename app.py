@@ -4,6 +4,7 @@ import numpy as np
 from datetime import datetime
 import joblib
 import os
+import pandas as pd  # pandasをインポート
 
 app = Flask(__name__)
 
@@ -17,36 +18,40 @@ def home():
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    date_str = request.form['date']
-    unrate = float(request.form['unrate'])
+    try:
+        date_str = request.form['date']
+        unrate = float(request.form['unrate'])
 
-    # 日付を分解して年と月を取得
-    date = datetime.strptime(date_str, '%Y-%m-%d')
-    year = date.year
-    month = date.month
+        # 日付を分解して年と月を取得
+        date = datetime.strptime(date_str, '%Y-%m-%d')
+        year = date.year
+        month = date.month
 
-    # 特徴量を準備
-    features = np.array([[year, month, unrate]])
-    
-    # デバッグログを追加
-    print(f"Received date: {date_str}, Unemployment rate: {unrate}")
-    print(f"Features before scaling: {features}")
+        # 特徴量を準備
+        features = np.array([[year, month, unrate]])
 
-    # フィーチャ名を設定
-    feature_names = ['year', 'month', 'unrate']
-    features_df = pd.DataFrame(features, columns=feature_names)
-    features_scaled = scaler.transform(features_df)
+        # デバッグログを追加
+        app.logger.info(f"Received date: {date_str}, Unemployment rate: {unrate}")
+        app.logger.info(f"Features before scaling: {features}")
 
-    # デバッグログを追加
-    print(f"Features after scaling: {features_scaled}")
+        # フィーチャ名を設定
+        feature_names = ['year', 'month', 'unrate']
+        features_df = pd.DataFrame(features, columns=feature_names)
+        features_scaled = scaler.transform(features_df)
 
-    # 予測を実行
-    prediction = model.predict(features_scaled)
-    predicted_price = prediction[0][0]
+        # デバッグログを追加
+        app.logger.info(f"Features after scaling: {features_scaled}")
 
-    print(f"Predicted price: {predicted_price}")
+        # 予測を実行
+        prediction = model.predict(features_scaled)
+        predicted_price = prediction[0][0]
 
-    return render_template('index.html', predicted_price=predicted_price)
+        app.logger.info(f"Predicted price: {predicted_price}")
+
+        return render_template('index.html', predicted_price=predicted_price)
+    except Exception as e:
+        app.logger.error(f"Error during prediction: {str(e)}")
+        return render_template('index.html', error=str(e))
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
